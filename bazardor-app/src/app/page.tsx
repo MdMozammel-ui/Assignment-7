@@ -1,69 +1,396 @@
-import Image from "next/image";
 
-export default function Home() {
+import Link from "next/link";
+
+type Product = {
+  id: number;
+  name: string;
+  emoji: string;
+  category: string;
+  unit: string;
+  price: number;
+  change: number;
+};
+
+const products: Product[] = [
+  { id: 1, name: "মিনিকেট চাল", emoji: "🍚", category: "চাল", unit: "প্রতি কেজি", price: 75, change: 2.1 },
+  { id: 2, name: "আলু", emoji: "🥔", category: "সবজি", unit: "প্রতি কেজি", price: 30, change: -4.5 },
+  { id: 3, name: "পেঁয়াজ", emoji: "🧅", category: "সবজি", unit: "প্রতি কেজি", price: 65, change: 3.2 },
+  { id: 4, name: "সয়াবিন তেল", emoji: "🫙", category: "তেল", unit: "প্রতি লিটার", price: 170, change: 0 },
+  { id: 5, name: "ডিম", emoji: "🥚", category: "প্রোটিন", unit: "প্রতি ডজন", price: 150, change: -2.5 },
+  { id: 6, name: "মসুর ডাল", emoji: "🫘", category: "ডাল", unit: "প্রতি কেজি", price: 120, change: 1.8 },
+  { id: 7, name: "কাঁচা মরিচ", emoji: "🌶️", category: "সবজি", unit: "প্রতি কেজি", price: 100, change: -5.2 },
+  { id: 8, name: "রসুন", emoji: "🧄", category: "মসলা", unit: "প্রতি কেজি", price: 180, change: 1.1 },
+  { id: 9, name: "আদা", emoji: "🫚", category: "মসলা", unit: "প্রতি কেজি", price: 220, change: -1.4 },
+  { id: 10, name: "ইলিশ মাছ", emoji: "🐟", category: "মাছ", unit: "প্রতি কেজি", price: 900, change: 2.9 },
+  { id: 11, name: "মুরগি", emoji: "🍗", category: "মাংস", unit: "প্রতি কেজি", price: 190, change: -1.7 },
+  { id: 12, name: "টমেটো", emoji: "🍅", category: "সবজি", unit: "প্রতি কেজি", price: 60, change: 0 },
+];
+
+const categories = [
+  { name: "সব পণ্য", href: "#সব-পণ্য" },
+  { name: "চাল", href: "#সব-পণ্য" },
+  { name: "সবজি", href: "#সব-পণ্য" },
+  { name: "ডাল", href: "#সব-পণ্য" },
+  { name: "তেল", href: "#সব-পণ্য" },
+  { name: "মাছ", href: "#সব-পণ্য" },
+  { name: "মাংস", href: "#সব-পণ্য" },
+  { name: "মসলা", href: "#সব-পণ্য" },
+];
+
+const taka = (value: number) =>
+  new Intl.NumberFormat("bn-BD", {
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const percent = (value: number) =>
+  new Intl.NumberFormat("bn-BD", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(Math.abs(value));
+
+function getBanglaDate() {
+  return "১১ অক্টোবর, ২০২৬";
+}
+
+function ChangeBadge({ change }: { change: number }) {
+  if (change > 0) {
+    return (
+      <span className="product-change change-up">
+        ▲ {percent(change)}%
+      </span>
+    );
+  }
+
+  if (change < 0) {
+    return (
+      <span className="product-change change-down">
+        ▼ {percent(change)}%
+      </span>
+    );
+  }
+
+  return <span className="product-change change-flat">— ০.০%</span>;
+}
+
+function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <Link
+      href={`/product/${product.id}`}
+      className="product-card"
+      aria-label={`${product.name} বিস্তারিত দেখুন`}
+    >
+      <div className="product-emoji" aria-hidden="true">
+        {product.emoji}
+      </div>
+
+      <div className="product-name">{product.name}</div>
+      <div className="product-unit">{product.unit}</div>
+
+      <div className="product-price">
+        {taka(product.price)} টাকা
+      </div>
+
+      <div className="product-card-footer">
+        <ChangeBadge change={product.change} />
+        <span className="view-details">বিস্তারিত দেখুন ↗</span>
+      </div>
+    </Link>
+  );
+}
+
+function MarketCard({ product }: { product: Product }) {
+  return (
+    <Link
+      href={`/product/${product.id}`}
+      className="market-card"
+      aria-label={`${product.name} বিস্তারিত দেখুন`}
+    >
+      <div className="product-emoji" aria-hidden="true">
+        {product.emoji}
+      </div>
+
+      <div className="product-info">
+        <div className="product-name">{product.name}</div>
+        <div className="product-unit">{product.unit}</div>
+        <div className="product-price">{taka(product.price)} টাকা</div>
+      </div>
+
+      <ChangeBadge change={product.change} />
+    </Link>
+  );
+}
+
+function Navbar() {
+  const tickerProducts = [...products, ...products];
+
+  return (
+    <>
+      <div className="top-note">
+        🥬 প্রতিদিনের বাজারদর জানুন, সচেতনভাবে বাজার করুন
+      </div>
+
+      <header className="navbar">
+        <div className="site-container">
+          <div className="nav-main">
+            <Link href="/" className="brand" aria-label="বাজার দর হোম">
+              <img
+                src="/logo-icon.png"
+                alt=""
+                className="brand-logo"
+              />
+              <div>
+                <div className="brand-title">বাজার দর</div>
+                <div className="brand-date">{getBanglaDate()}</div>
+              </div>
+            </Link>
+
+            <div className="auth-actions">
+              <Link href="/signin" className="btn btn-outline">
+                সাইন ইন
+              </Link>
+              <Link href="/signup" className="btn btn-primary">
+                সাইন আপ
+              </Link>
+            </div>
+          </div>
+
+          <nav className="category-nav" aria-label="পণ্যের বিভাগ">
+            {categories.map((category, index) => (
+              <a
+                key={category.name}
+                href={category.href}
+                className={`category-link ${index === 0 ? "active" : ""}`}
+              >
+                {category.name}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <div className="ticker" aria-label="বাজারদরের চলমান তালিকা">
+        <div className="ticker-track">
+          {[0, 1].map((group) => (
+            <div className="ticker-group" key={group}>
+              {tickerProducts.map((product, index) => (
+                <span
+                  className="ticker-item"
+                  key={`${group}-${product.id}-${index}`}
+                >
+                  <span>{product.emoji}</span>
+                  <span>{product.name}</span>
+                  <span className="ticker-price">
+                    {taka(product.price)} টাকা
+                  </span>
+                  <span className={product.change >= 0 ? "up" : "down"}>
+                    {product.change > 0
+                      ? `▲ ${percent(product.change)}%`
+                      : product.change < 0
+                        ? `▼ ${percent(product.change)}%`
+                        : "—"}
+                  </span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="hero">
+      <div className="site-container hero-grid">
+        <div>
+          <div className="eyebrow">
+            <span>🌿</span>
+            আপনার প্রতিদিনের বাজার সহযোগী
+          </div>
+
+          <h1>
+            বাজারের সঠিক দাম,
+            <br />
+            <span>সিদ্ধান্ত হোক সহজ।</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="hero-description">
+            চাল, ডাল, মাছ, মাংস ও নিত্যপ্রয়োজনীয় পণ্যের
+            বাজারদর জানুন এক জায়গায়। দাম তুলনা করুন,
+            পরিকল্পনা করে বাজার করুন।
           </p>
+
+          <div className="hero-actions">
+            <a href="#সব-পণ্য" className="btn btn-primary">
+              সব পণ্যের দাম দেখুন <span>→</span>
+            </a>
+
+            <a href="#বাজার-পরিবর্তন" className="btn btn-outline">
+              আজকের বাজার
+            </a>
+          </div>
+
+          <div className="hero-note">
+            <span>✓</span>
+            সহজ তথ্য · সুন্দর অভিজ্ঞতা · সচেতন কেনাকাটা
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+
+        <div className="hero-visual">
+          <div className="hero-image-wrap">
+            <img
+              src="/bazar-hero.png"
+              alt="তাজা বাজারের পণ্য"
+              className="hero-image"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          <div className="floating-card one">
+            <div className="floating-emoji">🥬</div>
+            <div>
+              <div className="floating-label">নিত্যপ্রয়োজনীয় পণ্য</div>
+              <div className="floating-value">এক জায়গায় সব দাম</div>
+            </div>
+          </div>
+
+          <div className="floating-card two">
+            <div className="floating-emoji">📊</div>
+            <div>
+              <div className="floating-label">বাজারের তথ্য</div>
+              <div className="floating-value">দাম তুলনা করুন</div>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function MarketSection() {
+  const risers = products
+    .filter((product) => product.change > 0)
+    .sort((a, b) => b.change - a.change)
+    .slice(0, 6);
+
+  const fallers = products
+    .filter((product) => product.change < 0)
+    .sort((a, b) => a.change - b.change)
+    .slice(0, 6);
+
+  return (
+    <section className="section market-section" id="বাজার-পরিবর্তন">
+      <div className="site-container">
+        <div className="section-heading">
+          <div>
+            <div className="section-kicker">আজকের বাজার</div>
+            <h2 className="section-title">দামের পরিবর্তন</h2>
+            <p className="section-description">
+              কোন পণ্যের দাম বাড়ছে আর কোনটির দাম কমছে, এক নজরে দেখুন।
+            </p>
+          </div>
+        </div>
+
+        <div className="section-heading">
+          <div>
+            <h3 className="section-title">আজ দাম বেড়েছে ▲</h3>
+            <p className="section-description">
+              দাম বৃদ্ধির হারে এগিয়ে থাকা পণ্য
+            </p>
+          </div>
+        </div>
+
+        <div className="market-grid">
+          {risers.map((product) => (
+            <MarketCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        <div className="section-heading" style={{ marginTop: 35 }}>
+          <div>
+            <h3 className="section-title">আজ দাম কমেছে ▼</h3>
+            <p className="section-description">
+              তুলনামূলক কম দামে পাওয়া যাচ্ছে
+            </p>
+          </div>
+        </div>
+
+        <div className="market-grid">
+          {fallers.map((product) => (
+            <MarketCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AllProducts() {
+  return (
+    <section className="products-section" id="সব-পণ্য">
+      <div className="site-container">
+        <div className="section-heading">
+          <div>
+            <div className="section-kicker">পণ্যের তালিকা</div>
+            <h2 className="section-title">সব পণ্য</h2>
+            <p className="section-description">
+              আপনার প্রয়োজনীয় পণ্যের দাম দেখুন এবং বিস্তারিত জানতে নির্বাচন করুন।
+            </p>
+          </div>
+        </div>
+
+        <div className="product-toolbar">
+          <span className="section-description">
+            মোট {taka(products.length)}টি পণ্য
+          </span>
+
+          <span className="section-description">
+            দাম বাংলাদেশি টাকায়
+          </span>
+        </div>
+
+        <div className="products-grid">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="site-container footer-inner">
+        <div>
+          <Link href="/" className="footer-brand">
+            🛒 বাজার দর
+          </Link>
+          <div className="footer-description">
+            প্রয়োজনীয় পণ্যের দাম এক নজরে।
+          </div>
+        </div>
+
+        <p className="footer-disclaimer">
+          সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।
+          কেনাকাটার আগে স্থানীয় বাজারে দাম যাচাই করে নিন।
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <MarketSection />
+        <AllProducts />
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
