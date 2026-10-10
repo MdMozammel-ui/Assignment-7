@@ -50,6 +50,7 @@ a {
   margin-inline: auto;
 }
 
+/* Top note */
 .top-note {
   background: var(--green-dark);
   color: #fff;
@@ -58,9 +59,14 @@ a {
   font-size: 12px;
 }
 
+/* Navbar */
 .navbar {
+  position: relative;
+  z-index: 10;
+  width: 100%;
   background: #fff;
   border-bottom: 1px solid var(--border);
+  color: var(--foreground);
 }
 
 .nav-main {
@@ -113,11 +119,7 @@ a {
   gap: 7px;
   border: 1px solid transparent;
   font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-outline {
@@ -136,6 +138,7 @@ a {
   background: var(--green-dark);
 }
 
+/* Category navigation */
 .category-nav {
   display: flex;
   align-items: center;
@@ -165,25 +168,30 @@ a {
   font-weight: 700;
 }
 
+/* Smooth market ticker */
 .ticker {
+  width: 100%;
   overflow: hidden;
-  background: #173d2a;
-  color: white;
-  border-bottom: 3px solid #e6a441;
+  white-space: nowrap;
+  position: relative;
+  background: var(--green-dark);
+  color: #fff;
 }
 
 .ticker-track {
   display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   width: max-content;
-  animation: ticker-scroll 35s linear infinite;
-}
-
-.ticker:hover .ticker-track {
-  animation-play-state: paused;
+  max-width: none;
+  animation: ticker-scroll 5s linear infinite !important;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .ticker-group {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 27px;
   padding: 12px 15px;
@@ -191,7 +199,8 @@ a {
 }
 
 .ticker-item {
-  display: flex;
+  display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 7px;
   font-size: 13px;
@@ -211,13 +220,19 @@ a {
 
 @keyframes ticker-scroll {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
+
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+/* Hero */
 .hero {
   padding: 65px 0 55px;
   overflow: hidden;
@@ -351,6 +366,7 @@ a {
   font-weight: 700;
 }
 
+/* Sections */
 .section {
   padding: 45px 0;
 }
@@ -383,6 +399,7 @@ a {
   line-height: 1.8;
 }
 
+/* Market cards */
 .market-section {
   padding-top: 48px;
 }
@@ -402,11 +419,10 @@ a {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 17px;
-  transition: 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 .market-card:hover {
-  transform: translateY(-3px);
   box-shadow: 0 10px 25px #213a2410;
 }
 
@@ -470,6 +486,7 @@ a {
   background: #eff1ee;
 }
 
+/* All products */
 .products-section {
   background: #f0f3eb;
   padding: 58px 0 65px;
@@ -508,11 +525,10 @@ a {
   background: #fff;
   border: 1px solid #e5e9e1;
   border-radius: 18px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.2s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 14px 30px #213a2410;
 }
 
@@ -543,6 +559,7 @@ a {
   font-weight: 700;
 }
 
+/* Footer */
 .footer {
   background: #123d29;
   color: #fff;
@@ -574,6 +591,7 @@ a {
   line-height: 1.8;
 }
 
+/* Tablet */
 @media (max-width: 1000px) {
   .hero-grid {
     gap: 24px;
@@ -588,9 +606,10 @@ a {
   }
 }
 
+/* Mobile */
 @media (max-width: 700px) {
   .site-container {
-    width: min(100% - 28px, 540px);
+    width: min(calc(100% - 28px), 540px);
   }
 
   .top-note {
@@ -771,36 +790,20 @@ a {
   }
 }
 
+/* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    transform: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-}
-.navbar {
-  display: block;
-  position: relative;
-  width: 100%;
-  min-height: 70px;
-  background: #ffffff;
-  color: #17211b;
-  z-index: 100;
-}
-
-.nav-main {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 20px;
-}
-
-.category-nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
 }
