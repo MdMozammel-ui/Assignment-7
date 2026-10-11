@@ -184,7 +184,7 @@ a {
   align-items: center;
   width: max-content;
   max-width: none;
-  animation: ticker-scroll 5s linear infinite !important;
+  animation: ticker-scroll 15s linear infinite !important;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }

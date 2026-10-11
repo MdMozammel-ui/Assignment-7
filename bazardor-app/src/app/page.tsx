@@ -1,8 +1,12 @@
 
 import Link from "next/link";
+import { getProducts, formatPrice } from "@/lib/products";
+import type { Product as ApiProduct } from "@/lib/products";
+export const instant = false;
 
 type Product = {
   id: number;
+  slug: string;
   name: string;
   emoji: string;
   category: string;
@@ -10,21 +14,6 @@ type Product = {
   price: number;
   change: number;
 };
-
-const products: Product[] = [
-  { id: 1, name: "মিনিকেট চাল", emoji: "🍚", category: "চাল", unit: "প্রতি কেজি", price: 75, change: 2.1 },
-  { id: 2, name: "আলু", emoji: "🥔", category: "সবজি", unit: "প্রতি কেজি", price: 30, change: -4.5 },
-  { id: 3, name: "পেঁয়াজ", emoji: "🧅", category: "সবজি", unit: "প্রতি কেজি", price: 65, change: 3.2 },
-  { id: 4, name: "সয়াবিন তেল", emoji: "🫙", category: "তেল", unit: "প্রতি লিটার", price: 170, change: 0 },
-  { id: 5, name: "ডিম", emoji: "🥚", category: "প্রোটিন", unit: "প্রতি ডজন", price: 150, change: -2.5 },
-  { id: 6, name: "মসুর ডাল", emoji: "🫘", category: "ডাল", unit: "প্রতি কেজি", price: 120, change: 1.8 },
-  { id: 7, name: "কাঁচা মরিচ", emoji: "🌶️", category: "সবজি", unit: "প্রতি কেজি", price: 100, change: -5.2 },
-  { id: 8, name: "রসুন", emoji: "🧄", category: "মসলা", unit: "প্রতি কেজি", price: 180, change: 1.1 },
-  { id: 9, name: "আদা", emoji: "🫚", category: "মসলা", unit: "প্রতি কেজি", price: 220, change: -1.4 },
-  { id: 10, name: "ইলিশ মাছ", emoji: "🐟", category: "মাছ", unit: "প্রতি কেজি", price: 900, change: 2.9 },
-  { id: 11, name: "মুরগি", emoji: "🍗", category: "মাংস", unit: "প্রতি কেজি", price: 190, change: -1.7 },
-  { id: 12, name: "টমেটো", emoji: "🍅", category: "সবজি", unit: "প্রতি কেজি", price: 60, change: 0 },
-];
 
 const categories = [
   { name: "সব পণ্য", href: "#সব-পণ্য" },
@@ -37,10 +26,7 @@ const categories = [
   { name: "মসলা", href: "#সব-পণ্য" },
 ];
 
-const taka = (value: number) =>
-  new Intl.NumberFormat("bn-BD", {
-    maximumFractionDigits: 0,
-  }).format(value);
+const taka = (value: number) => formatPrice(value);
 
 const percent = (value: number) =>
   new Intl.NumberFormat("bn-BD", {
@@ -50,6 +36,34 @@ const percent = (value: number) =>
 
 function getBanglaDate() {
   return "১১ অক্টোবর, ২০২৬";
+}
+
+function mapProduct(item: ApiProduct): Product {
+  const unitLabels: Record<string, string> = {
+    kg: "প্রতি কেজি",
+    liter: "প্রতি লিটার",
+    litre: "প্রতি লিটার",
+    dozen: "প্রতি ডজন",
+    piece: "প্রতি পিস",
+  };
+
+  const changeValue =
+    item.change.dir === "up"
+      ? Math.abs(item.change.pct)
+      : item.change.dir === "down"
+        ? -Math.abs(item.change.pct)
+        : 0;
+
+  return {
+    id: item.id,
+    slug: item.slug,
+    name: item.nameBn,
+    emoji: item.image || item.categoryIcon || "🛒",
+    category: item.categoryNameBn,
+    unit: unitLabels[item.unit.toLowerCase()] || `প্রতি ${item.unit}`,
+    price: item.today,
+    change: changeValue,
+  };
 }
 
 function ChangeBadge({ change }: { change: number }) {
@@ -75,7 +89,7 @@ function ChangeBadge({ change }: { change: number }) {
 function ProductCard({ product }: { product: Product }) {
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={`/product/${product.slug}`}
       className="product-card"
       aria-label={`${product.name} বিস্তারিত দেখুন`}
     >
@@ -86,9 +100,7 @@ function ProductCard({ product }: { product: Product }) {
       <div className="product-name">{product.name}</div>
       <div className="product-unit">{product.unit}</div>
 
-      <div className="product-price">
-        {taka(product.price)} টাকা
-      </div>
+      <div className="product-price">{taka(product.price)} টাকা</div>
 
       <div className="product-card-footer">
         <ChangeBadge change={product.change} />
@@ -101,7 +113,7 @@ function ProductCard({ product }: { product: Product }) {
 function MarketCard({ product }: { product: Product }) {
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={`/product/${product.slug}`}
       className="market-card"
       aria-label={`${product.name} বিস্তারিত দেখুন`}
     >
@@ -120,7 +132,7 @@ function MarketCard({ product }: { product: Product }) {
   );
 }
 
-function Navbar() {
+function Navbar({ products }: { products: Product[] }) {
   const tickerProducts = [...products, ...products];
 
   return (
@@ -133,11 +145,7 @@ function Navbar() {
         <div className="site-container">
           <div className="nav-main">
             <Link href="/" className="brand" aria-label="বাজার দর হোম">
-              <img
-                src="/logo-icon.png"
-                alt=""
-                className="brand-logo"
-              />
+              <img src="/logo-icon.png" alt="" className="brand-logo" />
               <div>
                 <div className="brand-title">বাজার দর</div>
                 <div className="brand-date">{getBanglaDate()}</div>
@@ -267,7 +275,7 @@ function Hero() {
   );
 }
 
-function MarketSection() {
+function MarketSection({ products }: { products: Product[] }) {
   const risers = products
     .filter((product) => product.change > 0)
     .sort((a, b) => b.change - a.change)
@@ -300,11 +308,15 @@ function MarketSection() {
           </div>
         </div>
 
-        <div className="market-grid">
-          {risers.map((product) => (
-            <MarketCard key={product.id} product={product} />
-          ))}
-        </div>
+        {risers.length > 0 ? (
+          <div className="market-grid">
+            {risers.map((product) => (
+              <MarketCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="section-description">দাম বাড়ার তথ্য পাওয়া যায়নি।</p>
+        )}
 
         <div className="section-heading" style={{ marginTop: 35 }}>
           <div>
@@ -315,17 +327,21 @@ function MarketSection() {
           </div>
         </div>
 
-        <div className="market-grid">
-          {fallers.map((product) => (
-            <MarketCard key={product.id} product={product} />
-          ))}
-        </div>
+        {fallers.length > 0 ? (
+          <div className="market-grid">
+            {fallers.map((product) => (
+              <MarketCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="section-description">দাম কমার তথ্য পাওয়া যায়নি।</p>
+        )}
       </div>
     </section>
   );
 }
 
-function AllProducts() {
+function AllProducts({ products }: { products: Product[] }) {
   return (
     <section className="products-section" id="সব-পণ্য">
       <div className="site-container">
@@ -343,17 +359,22 @@ function AllProducts() {
           <span className="section-description">
             মোট {taka(products.length)}টি পণ্য
           </span>
-
           <span className="section-description">
             দাম বাংলাদেশি টাকায়
           </span>
         </div>
 
-        <div className="products-grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {products.length > 0 ? (
+          <div className="products-grid">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="section-description">
+            এই মুহূর্তে পণ্যের তথ্য পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেষ্টা করুন।
+          </p>
+        )}
       </div>
     </section>
   );
@@ -368,12 +389,12 @@ function Footer() {
             🛒 বাজার দর
           </Link>
           <div className="footer-description">
-            প্রয়োজনীয় পণ্যের দাম এক নজরে।
+            প্রয়োজনীয় পণ্যের দাম এক নজরে।
           </div>
         </div>
 
         <p className="footer-disclaimer">
-          সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।
+          বাজারদর সময় ও স্থানভেদে পরিবর্তিত হতে পারে।
           কেনাকাটার আগে স্থানীয় বাজারে দাম যাচাই করে নিন।
         </p>
       </div>
@@ -381,14 +402,23 @@ function Footer() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  let products: Product[] = [];
+
+  try {
+    const apiProducts = await getProducts();
+    products = apiProducts.map(mapProduct);
+  } catch (error) {
+    console.error("বাজারদরের API থেকে তথ্য আনা যায়নি:", error);
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar products={products} />
       <main>
         <Hero />
-        <MarketSection />
-        <AllProducts />
+        <MarketSection products={products} />
+        <AllProducts products={products} />
       </main>
       <Footer />
     </>
