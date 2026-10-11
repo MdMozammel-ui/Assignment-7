@@ -1,4 +1,4 @@
-
+import { Toaster } from "react-hot-toast";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -15,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster position="top-right" />
+        </body>
     </html>
   );
 }

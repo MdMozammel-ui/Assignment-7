@@ -1,7 +1,9 @@
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getProducts, formatPrice } from "@/lib/products";
+import { auth } from "@/lib/auth";
 
 export const instant = false;
 
@@ -11,6 +13,20 @@ type Props = {
 
 export default async function ProductDetailsPage({ params }: Props) {
   const { slug } = await params;
+
+  // Check whether the user is logged in
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // Redirect unauthenticated users to Sign In
+  if (!session?.user) {
+    const callbackURL = `/product/${slug}`;
+
+    redirect(
+      `/signin?reason=auth-required&callbackURL=${encodeURIComponent(callbackURL)}`
+    );
+  }
 
   let products;
 

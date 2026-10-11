@@ -1,9 +1,10 @@
 
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SigninPage() {
@@ -13,6 +14,39 @@ export default function SigninPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [callbackURL, setCallbackURL] = useState("/");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reason = params.get("reason");
+    const requestedURL = params.get("callbackURL");
+
+    if (
+      requestedURL &&
+      requestedURL.startsWith("/") &&
+      !requestedURL.startsWith("//")
+    ) {
+      setCallbackURL(requestedURL);
+    }
+
+    if (reason === "auth-required") {
+      // URL থেকে reason সরিয়ে দেওয়ার পর Toast দেখাও।
+      params.delete("reason");
+
+      const query = params.toString();
+      const newURL =
+        window.location.pathname +
+        (query ? `?${query}` : "") +
+        window.location.hash;
+
+      window.history.replaceState(window.history.state, "", newURL);
+
+      toast("এই পেজটি দেখতে আগে লগইন করো।", {
+        icon: "🔐",
+        id: "auth-required",
+      });
+    }
+  }, []);
 
   async function handleSignin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -23,7 +57,7 @@ export default function SigninPage() {
       const result = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
+        callbackURL,
       });
 
       if (result.error) {
@@ -33,7 +67,14 @@ export default function SigninPage() {
         return;
       }
 
-      router.push("/");
+      // আগের সতর্কবার্তা সরিয়ে Success Toast দেখাও।
+      toast.dismiss("auth-required");
+
+      toast.success("সফলভাবে লগইন হয়েছে!", {
+        id: "signin-success",
+      });
+
+      router.replace(callbackURL);
       router.refresh();
     } catch {
       setMessage("লগইন করা যায়নি। আবার চেষ্টা করো।");

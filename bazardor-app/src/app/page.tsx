@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getProducts, formatPrice } from "@/lib/products";
 import type { Product as ApiProduct } from "@/lib/products";
 export const instant = false;
+import NavbarAuth from "@/components/NavbarAuth";
 
 type Product = {
   id: number;
@@ -143,40 +144,35 @@ function Navbar({ products }: { products: Product[] }) {
         🥬 প্রতিদিনের বাজারদর জানুন, সচেতনভাবে বাজার করুন
       </div>
 
-      <header className="navbar">
-        <div className="site-container">
-          <div className="nav-main">
-            <Link href="/" className="brand" aria-label="বাজার দর হোম">
-              <img src="/logo-icon.png" alt="" className="brand-logo" />
-              <div>
-                <div className="brand-title">বাজার দর</div>
-                <div className="brand-date">{getBanglaDate()}</div>
-              </div>
-            </Link>
-
-            <div className="auth-actions">
-              <Link href="/signin" className="btn btn-outline">
-                সাইন ইন
-              </Link>
-              <Link href="/signup" className="btn btn-primary">
-                সাইন আপ
-              </Link>
-            </div>
-          </div>
-
-          <nav className="category-nav" aria-label="পণ্যের বিভাগ">
-            {categories.map((category, index) => (
-              <a
-                key={category.name}
-                href={category.href}
-                className={`category-link ${index === 0 ? "active" : ""}`}
-              >
-                {category.name}
-              </a>
-            ))}
-          </nav>
+      
+<header className="navbar">
+  <div className="site-container">
+    <div className="nav-main">
+      <Link href="/" className="brand" aria-label="বাজার দর হোম">
+        <img src="/logo-icon.png" alt="" className="brand-logo" />
+        <div>
+          <div className="brand-title">বাজার দর</div>
+          <div className="brand-date">{getBanglaDate()}</div>
         </div>
-      </header>
+      </Link>
+
+      <NavbarAuth />
+    </div>
+
+    <nav className="category-nav" aria-label="পণ্যের বিভাগ">
+      {categories.map((category, index) => (
+        <a
+          key={category.name}
+          href={category.href}
+          className={`category-link ${index === 0 ? "active" : ""}`}
+        >
+          {category.name}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
 
       <div className="ticker" aria-label="বাজারদরের চলমান তালিকা">
         <div className="ticker-track">
