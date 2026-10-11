@@ -5,6 +5,7 @@ import type { Product as ApiProduct } from "@/lib/products";
 export const instant = false;
 import NavbarAuth from "@/components/NavbarAuth";
 
+
 type Product = {
   id: number;
   slug: string;
@@ -107,7 +108,7 @@ function ProductCard({ product }: { product: Product }) {
 
       <div className="product-card-footer">
         <ChangeBadge change={product.change} />
-        <span className="view-details">বিস্তারিত দেখুন ↗</span>
+        {/* <span className="view-details">বিস্তারিত দেখুন ↗</span> */}
       </div>
     </Link>
   );

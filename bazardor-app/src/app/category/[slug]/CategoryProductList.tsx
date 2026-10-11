@@ -64,11 +64,20 @@ export default function CategoryProductList({ products }: Props) {
         <label className="category-sort">
           <span>সাজান:</span>
 
-          <select
+          {/* <select
             value={sort}
             onChange={(event) => setSort(event.target.value)}
             aria-label="পণ্যের দাম অনুযায়ী সাজান"
-          >
+          > */}
+          <select
+  value={sort}
+  onChange={(event) => setSort(event.target.value)}
+  aria-label="পণ্যের দাম অনুযায়ী সাজান"
+  style={{
+    color: "#ffffff",
+    backgroundColor: "gray",
+  }}
+>
             <option value="default">ডিফল্ট</option>
             <option value="low">দাম: কম থেকে বেশি</option>
             <option value="high">দাম: বেশি থেকে কম</option>
@@ -103,7 +112,7 @@ export default function CategoryProductList({ products }: Props) {
 
             <div className="product-card-footer">
               <ChangeBadge product={product} />
-              <span className="view-details">বিস্তারিত দেখুন ↗</span>
+              {/* <span className="view-details">বিস্তারিত দেখুন ↗</span> */}
             </div>
           </Link>
         ))}
