@@ -15,16 +15,18 @@ type Product = {
   change: number;
 };
 
+
 const categories = [
   { name: "সব পণ্য", href: "#সব-পণ্য" },
-  { name: "চাল", href: "#সব-পণ্য" },
-  { name: "সবজি", href: "#সব-পণ্য" },
-  { name: "ডাল", href: "#সব-পণ্য" },
-  { name: "তেল", href: "#সব-পণ্য" },
-  { name: "মাছ", href: "#সব-পণ্য" },
-  { name: "মাংস", href: "#সব-পণ্য" },
-  { name: "মসলা", href: "#সব-পণ্য" },
+  { name: "চাল", href: "/category/chal" },
+  { name: "সবজি", href: "/category/sobji" },
+  { name: "ডাল", href: "/category/dal" },
+  { name: "তেল", href: "/category/tel" },
+  { name: "মাছ", href: "/category/mach" },
+  { name: "মাংস", href: "/category/mangsho" },
+  { name: "মসলা", href: "/category/mosla" },
 ];
+
 
 const taka = (value: number) => formatPrice(value);
 
